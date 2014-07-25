@@ -33,4 +33,21 @@ feature 'Tasks' do
     expect(task.reload).to eq(task)
   end
 
+  scenario 'User can edit tasks when there is more than one' do
+    user = create_user email: "user@example.com"
+    task_list = create_task_list(name: "Work List")
+    task = create_task(task_list: task_list, description: "Some task", due_date: 2.days.from_now)
+
+    login(user)
+    click_on "+ Add Task", match: :first
+    fill_in "Description", with: "Another task"
+    click_on "Create Task"
+    click_on "edit", match: :first
+    fill_in "Description", with: "Updated task"
+    click_on "Update Task"
+    expect(page).to have_content("Some task")
+    expect(page).to have_content("Updated task")
+    expect(task.reload).to eq(task)
+  end
+
 end
